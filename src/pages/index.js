@@ -1,8 +1,6 @@
 import Head from "next/head";
-import Image from "next/image";
 import localFont from "next/font/local";
-import styles from "@/styles/Home.module.css";
-import axios from "axios";
+import {axiosInstance} from "@/lib/axios"
 import { useEffect } from "react";
 
 const geistSans = localFont({
@@ -19,7 +17,9 @@ const geistMono = localFont({
 export default function Home() {
   const fetchProducts = async () => {
     try {
-      const productResponse = await axios.get("http://localhost:2000/products")
+      const productResponse = await axiosInstance.get(
+        "/products"
+      )
     console.log(productResponse)
     } catch (error) {
       console.log(error)
