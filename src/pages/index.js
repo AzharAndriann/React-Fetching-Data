@@ -3,17 +3,6 @@ import localFont from "next/font/local";
 import {axiosInstance} from "@/lib/axios"
 import { useEffect } from "react";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
 export default function Home() {
   const fetchProducts = async () => {
     try {
@@ -38,10 +27,32 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div>
-        <main>
-         Hello World!
-        </main>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="container max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+          <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+            Hello World!
+          </h1>
+          <table className="w-full text-left table-auto border-collapse">
+            <thead>
+              <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <th className="py-3 px-4 border-b">ID</th>
+                <th className="py-3 px-4 border-b">Name</th>
+                <th className="py-3 px-4 border-b">Price</th>
+                <th className="py-3 px-4 border-b">Description</th>
+                <th className="py-3 px-4 border-b">Image</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="bg-white hover:bg-gray-50 text-gray-700">
+                <td className="py-3 px-4 border-b">Example ID</td>
+                <td className="py-3 px-4 border-b">Example Name</td>
+                <td className="py-3 px-4 border-b">Example Price</td>
+                <td className="py-3 px-4 border-b">Example Description</td>
+                <td className="py-3 px-4 border-b">Example Image</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );
