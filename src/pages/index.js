@@ -1,19 +1,39 @@
 import Head from "next/head";
-import localFont from "next/font/local";
 import {axiosInstance} from "@/lib/axios"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
 
 export default function Home() {
+  const [products, setProducts] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+
   const fetchProducts = async () => {
+    setIsLoading(true)
     try {
-      const productResponse = await axiosInstance.get(
-        "/products"
-      )
-    console.log(productResponse)
+      setTimeout(async () => {
+        const productResponse = await axiosInstance.get(
+          "/products"
+        )
+        setProducts(productResponse.data)
+        setIsLoading(false)
+      },1500)
     } catch (error) {
       console.log(error)
     }
   }
+
+  const renderProducts = () => {
+    return products?.map((product) => (
+      <tr key={product.id} className="bg-white hover:bg-gray-50 text-gray-700">
+        <td className="py-3 px-4 border-b">{product.id}</td>
+        <td className="py-3 px-4 border-b">{product.name}</td>
+        <td className="py-3 px-4 border-b">{product.price}</td>
+        <td className="py-3 px-4 border-b">{product.description}</td>
+        <td className="py-3 px-4 border-b">{product.image}</td>
+      </tr>
+    ));
+  };
+  
 
   useEffect(() => {
     fetchProducts()
@@ -43,13 +63,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-white hover:bg-gray-50 text-gray-700">
-                <td className="py-3 px-4 border-b">Example ID</td>
-                <td className="py-3 px-4 border-b">Example Name</td>
-                <td className="py-3 px-4 border-b">Example Price</td>
-                <td className="py-3 px-4 border-b">Example Description</td>
-                <td className="py-3 px-4 border-b">Example Image</td>
-              </tr>
+              {renderProducts()}
+              {isLoading ? <div className="loader"></div> : <div className="">dd</div>}
             </tbody>
           </table>
         </div>
