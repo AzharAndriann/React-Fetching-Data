@@ -4,23 +4,6 @@ import { useEffect, useState } from "react";
 
 
 export default function Home() {
-  const [products, setProducts] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  const fetchProducts = async () => {
-    setIsLoading(true)
-    try {
-      setTimeout(async () => {
-        const productResponse = await axiosInstance.get(
-          "/products"
-        )
-        setProducts(productResponse.data)
-        setIsLoading(false)
-      },1500)
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
   const renderProducts = () => {
     return products?.map((product) => (
@@ -64,7 +47,8 @@ export default function Home() {
             </thead>
             <tbody>
               {renderProducts()}
-              {isLoading ? <div className="loader"></div> : <div className="">dd</div>}
+              {/* {isLoading ? <div className="loader"></div> : null} */}
+              {/* {isLoading && <div className="loader"></div>} */}
             </tbody>
           </table>
         </div>
