@@ -2,6 +2,7 @@ import Head from "next/head";
 import {axiosInstance} from "@/lib/axios"
 import { useEffect, useState } from "react";
 import { useProducts } from "@/features/product/useProducts";
+import { useQuery } from "@tanstack/react-query";
 
 
 export default function Home() {
@@ -19,6 +20,16 @@ export default function Home() {
       </tr>
     ));
   };
+
+  const productQuery = useQuery({
+    queryFn: async () => {
+      const productResponse = await axiosInstance.get(
+        "/products"
+      )
+      return productResponse
+    },
+    queryKey
+  })
 
   
   return (
@@ -45,7 +56,13 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {renderProducts()}
+              {
+                products ? (
+                  renderProducts()
+                ) : (
+                  <div className="loader"></div>
+                )
+              }
               {/* {isLoading ? <div className="loader"></div> : null} */}
               {/* {isLoading && <div className="loader"></div>} */}
             </tbody>
