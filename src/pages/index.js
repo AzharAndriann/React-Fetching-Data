@@ -1,9 +1,12 @@
 import Head from "next/head";
 import {axiosInstance} from "@/lib/axios"
 import { useEffect, useState } from "react";
+import { useProducts } from "@/features/product/useProducts";
 
 
 export default function Home() {
+
+  const {data: products, isLoading} = useProducts()
 
   const renderProducts = () => {
     return products?.map((product) => (
@@ -16,11 +19,7 @@ export default function Home() {
       </tr>
     ));
   };
-  
 
-  useEffect(() => {
-    fetchProducts()
-  }, [fetchProducts])
   
   return (
     <>

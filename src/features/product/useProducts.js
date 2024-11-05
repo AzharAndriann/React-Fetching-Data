@@ -31,6 +31,6 @@ const fetchProducts = async () => {
 
   return {
     data: products,
-    // isLoading: isLoading
+    // isLoading
   }
 }
