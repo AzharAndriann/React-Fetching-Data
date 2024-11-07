@@ -6,11 +6,10 @@ import { useQuery } from "@tanstack/react-query";
 
 
 export default function Home() {
-
   const {data: products, isLoading} = useProducts()
 
   const renderProducts = () => {
-    return products?.map((product) => (
+    return products?.data.map((product) => (
       <tr key={product.id} className="bg-white hover:bg-gray-50 text-gray-700">
         <td className="py-3 px-4 border-b">{product.id}</td>
         <td className="py-3 px-4 border-b">{product.name}</td>
@@ -20,16 +19,6 @@ export default function Home() {
       </tr>
     ));
   };
-
-  const productQuery = useQuery({
-    queryFn: async () => {
-      const productResponse = await axiosInstance.get(
-        "/products"
-      )
-      return productResponse
-    },
-    queryKey
-  })
 
   
   return (
@@ -56,14 +45,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {
-                products ? (
-                  renderProducts()
-                ) : (
-                  <div className="loader"></div>
-                )
-              }
-              {/* {isLoading ? <div className="loader"></div> : null} */}
+              {renderProducts()}
+              {/* {renderProducts() ? renderProducts() : <div className="loader"></div>} */}
               {/* {isLoading && <div className="loader"></div>} */}
             </tbody>
           </table>
