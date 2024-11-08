@@ -1,11 +1,19 @@
 import Head from "next/head";
-import { axiosInstance } from "@/lib/axios";
 import { useFetchProducts } from "@/features/product/useFetchProducts";
-import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import { useCreateProduct } from "@/features/product/useCreateProduct";
 
 export default function Home() {
-  const { data: products, isLoading: productIsLoading, refetch: refetchProducts } = useFetchProducts();
+  const { data: products,
+    isLoading: productIsLoading,
+    refetch: refetchProducts
+  } = useFetchProducts();
+
+  const { mutate, isLoading: createProductIsLoading } = useCreateProduct({
+    onSuccess: () => {
+      refetchProducts()
+    },
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -30,17 +38,7 @@ export default function Home() {
     },
   });
 
-  const { mutate, isLoading: createProductIsLoading } = useMutation({
-    mutationFn: async (body) => {
-      const productResponse = await axiosInstance.post("/products", body);
-      return productResponse;
-    },
-    onSuccess: () => {
-      formik.resetForm();
-      refetchProducts()
-      console.log("Product added successfully");
-    },
-  });
+
 
 
   const renderProducts = () => {
