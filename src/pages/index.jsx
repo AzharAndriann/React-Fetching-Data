@@ -54,6 +54,14 @@ export default function Home() {
     }
   })
 
+  const confirmationDelete = (productId) => {
+    const shouldDelete = confirm("Are you Sure")
+
+    if (shouldDelete) {
+      deleteProduct(productId)
+    }
+  } 
+
   const renderProducts = () => {
     return products?.data.map((product) => (
       <tr key={product.id} className="bg-white hover:bg-gray-50 text-gray-700">
@@ -62,7 +70,7 @@ export default function Home() {
         <td className="py-3 px-4 border-b">{product.price}</td>
         <td className="py-3 px-4 border-b">{product.description}</td>
         <td className="py-3 px-4 border-b">
-          <button onClick={() => deleteProduct(product.id)} className="bg-red-600 rounded-md px-2 py-1 text-white hover:bg-red-500 transition duration-200">Delete</button>
+          <button onClick={() => confirmationDelete(product.id)} className="bg-red-600 rounded-md px-2 py-1 text-white hover:bg-red-500 transition duration-200">Delete</button>
         </td>
       </tr>
     ));
