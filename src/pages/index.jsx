@@ -26,11 +26,11 @@ export default function Home() {
       formik.setFieldValue("price",0)
       formik.setFieldValue("description","")
       formik.setFieldValue("image", "")
-      alert("oke")
+      // alert("oke")
     },
   });
 
-  const { mutate } = useMutation({
+  const { mutate, isLoading: createProductIsLoading } = useMutation({
     mutationFn: async (body) => {
       const productResponse = await axiosInstance.post("/products", body);
       return productResponse;
@@ -143,13 +143,18 @@ export default function Home() {
                 onChange={handleFormInput}
               />
             </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 focus:outline-none"
-            >
-              Submit
-            </button>
+            {
+              createProductIsLoading ? (
+                <div className="loader items-center flex justify-center"></div>
+              ) : (
+                <button
+                type="submit"
+                className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 focus:outline-none"
+              >
+                Submit
+              </button>
+              )
+            }
           </form>
         </div>
       </div>
