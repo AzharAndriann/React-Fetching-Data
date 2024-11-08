@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { axiosInstance } from "@/lib/axios";
-import { useEffect, useState } from "react";
 import { useFetchProducts } from "@/features/product/useFetchProducts";
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
@@ -11,30 +10,36 @@ export default function Home() {
   const formik = useFormik({
     initialValues: {
       name: "",
-      price: "",
+      price: 0,
       description: "",
       image: "",
     },
-
     onSubmit: () => {
-      mutate()
-      console.log("oke")
-    }
-  });
-
-  const {mutate} = useMutation({
-    mutationFn: async () => {
-      const {name,price,description,image} = formik.values
-
-      const productResponse = await axiosInstance.post("/products", {
+      const { name, price, description, image } = formik.values;
+      mutate({
         name,
         price: parseInt(price),
         description,
         image
       })
-      return productResponse
-    }
-  })
+      formik.setFieldValue("name","")
+      formik.setFieldValue("price",0)
+      formik.setFieldValue("description","")
+      formik.setFieldValue("image", "")
+      alert("oke")
+    },
+  });
+
+  const { mutate } = useMutation({
+    mutationFn: async (body) => {
+      const productResponse = await axiosInstance.post("/products", body);
+      return productResponse;
+    },
+    onSuccess: () => {
+      formik.resetForm(); // Reset the form fields on successful submission
+      console.log("Product added successfully");
+    },
+  });
 
 
   const renderProducts = () => {
@@ -100,6 +105,7 @@ export default function Home() {
                   type="text"
                   className="w-full p-3 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   name="name"
+                  value={formik.values.name}
                   onChange={handleFormInput}
                 />
               </div>
@@ -109,6 +115,7 @@ export default function Home() {
                   type="number"
                   className="w-full p-3 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   name="price"
+                  value={formik.values.price}
                   onChange={handleFormInput}
                 />
               </div>
@@ -120,6 +127,7 @@ export default function Home() {
                 type="text"
                 className="w-full p-3 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 name="description"
+                value={formik.values.description}
                 onChange={handleFormInput}
               />
             </div>
@@ -130,6 +138,7 @@ export default function Home() {
                 type="text"
                 className="w-full p-3 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 name="image"
+                value={formik.values.image}
                 onChange={handleFormInput}
               />
             </div>
