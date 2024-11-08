@@ -2,11 +2,12 @@ import Head from "next/head";
 import { axiosInstance } from "@/lib/axios";
 import { useEffect, useState } from "react";
 import { useFetchProducts } from "@/features/product/useFetchProducts";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
 export default function Home() {
   const { data: products, isLoading } = useFetchProducts();
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -16,9 +17,24 @@ export default function Home() {
     },
 
     onSubmit: () => {
-      console.log("submitForm")
+      mutate()
+      console.log("oke")
     }
   });
+
+  const {mutate} = useMutation({
+    mutationFn: async () => {
+      const {name,price,description,image} = formik.values
+
+      const productResponse = await axiosInstance.post("/products", {
+        name,
+        price: parseInt(price),
+        description,
+        image
+      })
+      return productResponse
+    }
+  })
 
 
   const renderProducts = () => {
@@ -76,7 +92,7 @@ export default function Home() {
           </table>
 
           {/* Product Form */}
-          <form className="space-y-6" action={formik.handleSubmit}>
+          <form className="space-y-6" onSubmit={formik.handleSubmit}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="form-control">
                 <label className="block text-gray-600 mb-2">Product Name</label>
@@ -90,7 +106,7 @@ export default function Home() {
               <div className="form-control">
                 <label className="block text-gray-600 mb-2">Product Price</label>
                 <input
-                  type="text"
+                  type="number"
                   className="w-full p-3 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   name="price"
                   onChange={handleFormInput}
