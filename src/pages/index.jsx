@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
 export default function Home() {
-  const { data: products, isLoading } = useFetchProducts();
+  const { data: products, isLoading: productIsLoading, refetch: refetchProducts } = useFetchProducts();
 
   const formik = useFormik({
     initialValues: {
@@ -36,7 +36,8 @@ export default function Home() {
       return productResponse;
     },
     onSuccess: () => {
-      formik.resetForm(); // Reset the form fields on successful submission
+      formik.resetForm();
+      refetchProducts()
       console.log("Product added successfully");
     },
   });
@@ -84,7 +85,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {productIsLoading ? (
                 <tr>
                   <td colSpan="5" className="text-center py-4">
                     <div className="loader items-center flex justify-center"></div>
