@@ -2,6 +2,8 @@ import Head from "next/head";
 import { useFetchProducts } from "@/features/product/useFetchProducts";
 import { useFormik } from "formik";
 import { useCreateProduct } from "@/features/product/useCreateProduct";
+import { axiosInstance } from "@/lib/axios";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Home() {
   const { data: products,
@@ -9,7 +11,7 @@ export default function Home() {
     refetch: refetchProducts
   } = useFetchProducts();
 
-  const { mutate, isLoading: createProductIsLoading } = useCreateProduct({
+  const { mutate: createProduct, isLoading: createProductIsLoading } = useCreateProduct({
     onSuccess: () => {
       refetchProducts()
     },
@@ -24,7 +26,7 @@ export default function Home() {
     },
     onSubmit: () => {
       const { name, price, description, image } = formik.values;
-      mutate({
+      createProduct({
         name,
         price: parseInt(price),
         description,
@@ -39,7 +41,18 @@ export default function Home() {
   });
 
 
+  const {mutate: deleteProduct} = useMutation({
+    mutationFn: async (id) => {
+      const productResponse = await axiosInstance.delete(
+        `/products/${id}`
+      )
 
+      return productResponse
+    },
+    onSuccess: () => {
+      refetchProducts()
+    }
+  })
 
   const renderProducts = () => {
     return products?.data.map((product) => (
@@ -48,7 +61,9 @@ export default function Home() {
         <td className="py-3 px-4 border-b">{product.name}</td>
         <td className="py-3 px-4 border-b">{product.price}</td>
         <td className="py-3 px-4 border-b">{product.description}</td>
-        <td className="py-3 px-4 border-b">{product.image}</td>
+        <td className="py-3 px-4 border-b">
+          <button onClick={() => deleteProduct(product.id)} className="bg-red-600 rounded-md px-2 py-1 text-white hover:bg-red-500 transition duration-200">Delete</button>
+        </td>
       </tr>
     ));
   };
@@ -56,7 +71,6 @@ export default function Home() {
   const handleFormInput = (event) => {
       formik.setFieldValue(event.target.name, event.target.value)
   }
-
   return (
     <>
       <Head>
@@ -79,7 +93,7 @@ export default function Home() {
                 <th className="py-3 px-4 border-b">Name</th>
                 <th className="py-3 px-4 border-b">Price</th>
                 <th className="py-3 px-4 border-b">Description</th>
-                <th className="py-3 px-4 border-b">Image</th>
+                <th className="py-3 px-4 border-b">Action</th>
               </tr>
             </thead>
             <tbody>
