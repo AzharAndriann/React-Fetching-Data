@@ -2,8 +2,8 @@ import Head from "next/head";
 import { useFetchProducts } from "@/features/product/useFetchProducts";
 import { useFormik } from "formik";
 import { useCreateProduct } from "@/features/product/useCreateProduct";
-import { axiosInstance } from "@/lib/axios";
-import { useMutation } from "@tanstack/react-query";
+import { useDeleteProduct } from "@/features/product/useDeleteProduct";
+import { useEditProduct } from "@/features/product/useEditProduct";
 
 export default function Home() {
   const { data: products,
@@ -17,38 +17,51 @@ export default function Home() {
     },
   })
 
+  const { mutate: editProduct, isLoading: editProductIsLoading } = useEditProduct({
+    onSuccess: () => {
+      refetchProducts()
+    },
+  })
+
   const formik = useFormik({
     initialValues: {
       name: "",
       price: 0,
       description: "",
       image: "",
+      id: 0
     },
     onSubmit: () => {
-      const { name, price, description, image } = formik.values;
-      createProduct({
-        name,
-        price: parseInt(price),
-        description,
-        image
-      })
+      const { name, price, description, image, id } = formik.values;
+      if (id) {
+        editProduct({
+          name,
+          price: parseInt(price),
+          description,
+          image,
+          id: parseInt(id)
+        })
+      //  alert("okee")
+      } else {
+        createProduct({
+          name,
+          price: parseInt(price),
+          description,
+          image,
+          id
+        })
+        // alert("oke")
+      }
       formik.setFieldValue("name","")
       formik.setFieldValue("price",0)
       formik.setFieldValue("description","")
       formik.setFieldValue("image", "")
-      // alert("oke")
+      formik.setFieldValue("id", "")
     },
   });
 
 
-  const {mutate: deleteProduct} = useMutation({
-    mutationFn: async (id) => {
-      const productResponse = await axiosInstance.delete(
-        `/products/${id}`
-      )
-
-      return productResponse
-    },
+  const {mutate: deleteProduct} = useDeleteProduct({
     onSuccess: () => {
       refetchProducts()
     }
@@ -62,6 +75,14 @@ export default function Home() {
     }
   } 
 
+  const onEditClick = (product) => {
+    formik.setFieldValue("id", product.id)
+    formik.setFieldValue("name", product.name)
+    formik.setFieldValue("price", product.price)
+    formik.setFieldValue("description", product.description)
+    formik.setFieldValue("image", product.image)
+  }
+
   const renderProducts = () => {
     return products?.data.map((product) => (
       <tr key={product.id} className="bg-white hover:bg-gray-50 text-gray-700">
@@ -69,6 +90,9 @@ export default function Home() {
         <td className="py-3 px-4 border-b">{product.name}</td>
         <td className="py-3 px-4 border-b">{product.price}</td>
         <td className="py-3 px-4 border-b">{product.description}</td>
+        <td className="py-3 px-4 border-b">
+          <button onClick={() => onEditClick(product)} className="bg-gray-600 rounded-md px-2 py-1 text-white hover:bg-red-500 transition duration-200">Edit</button>
+        </td>
         <td className="py-3 px-4 border-b">
           <button onClick={() => confirmationDelete(product.id)} className="bg-red-600 rounded-md px-2 py-1 text-white hover:bg-red-500 transition duration-200">Delete</button>
         </td>
@@ -101,7 +125,7 @@ export default function Home() {
                 <th className="py-3 px-4 border-b">Name</th>
                 <th className="py-3 px-4 border-b">Price</th>
                 <th className="py-3 px-4 border-b">Description</th>
-                <th className="py-3 px-4 border-b">Action</th>
+                <th className="py-3 px-4 border-b" colSpan={2}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -121,6 +145,16 @@ export default function Home() {
           <form className="space-y-6" onSubmit={formik.handleSubmit}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="form-control">
+                <label className="block text-gray-600 mb-2">Product ID</label>
+                <input
+                  type="text"
+                  className="w-full p-3 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  name="name"
+                  value={formik.values.id}
+                  onChange={handleFormInput}
+                />
+              </div>
+              <div className="form-control">
                 <label className="block text-gray-600 mb-2">Product Name</label>
                 <input
                   type="text"
@@ -130,7 +164,10 @@ export default function Home() {
                   onChange={handleFormInput}
                 />
               </div>
-              <div className="form-control">
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="form-control">
                 <label className="block text-gray-600 mb-2">Product Price</label>
                 <input
                   type="number"
@@ -140,9 +177,7 @@ export default function Home() {
                   onChange={handleFormInput}
                 />
               </div>
-            </div>
-
-            <div className="form-control">
+              <div className="form-control">
               <label className="block text-gray-600 mb-2">Product Description</label>
               <input
                 type="text"
@@ -151,6 +186,7 @@ export default function Home() {
                 value={formik.values.description}
                 onChange={handleFormInput}
               />
+            </div>
             </div>
 
             <div className="form-control">
